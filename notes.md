@@ -37,6 +37,7 @@ Refine resources:
 - https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language
 - https://github.com/OpenRefine/OpenRefine/wiki/GREL-String-Functions
 
+https://data-lessons.github.io/library-openrefine/
 
 intro
 
@@ -47,3 +48,7 @@ possibilities
 suggested prior skills
 
 installation
+
+value.parseHtml().select("div.info-container a")[0].htmlAttr("href")
+
+forEach(value.parseHtml().select("div.info-container a[href*=mailto]"),v,v.htmlAttr("href")).join("; ")

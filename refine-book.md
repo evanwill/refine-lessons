@@ -15,7 +15,7 @@ now "html 2" has the text we are interested in, each sonnet is in a "<p>"
 we can parse the html to cleanly extract each sonnet.
 transform cells, type in box: 
 value.parseHtml().select("p")[0].innerHtml()
-note the index number [0] is necessary since our selector returns many items. change the index number and check the preview to see if you are getting the poems. 
+note the index number [0] is necessary since our selector returns many items. change the index number and check the preview to see if you are getting the poems.  selector syntax https://jsoup.org/cookbook/extracting-data/selector-syntax
 we need to create a loop to parse them all. 
 forEach(value.parseHtml().select("p"),e,e.innerHtml()).join("|")
 
