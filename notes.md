@@ -36,8 +36,9 @@ Refine resources:
 - https://github.com/OpenRefine/OpenRefine/wiki/Fetching-URLs-From-Web-Services
 - https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language
 - https://github.com/OpenRefine/OpenRefine/wiki/GREL-String-Functions
-
+- https://github.com/scottythered/gratefuldata/wiki
 https://data-lessons.github.io/library-openrefine/
+http://www.datacarpentry.org/OpenRefine-ecology-lesson/
 
 intro
 

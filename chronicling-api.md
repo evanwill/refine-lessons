@@ -2,6 +2,7 @@ API def, web services
 refine extensions, https://github.com/RubenVerborgh/Refine-NER-Extension 
 problem = changing API companies, parameters, difficult to maintain and update
 solution = learn apis, manually construct queries
+"A RESTful API is an application program interface (API) that uses HTTP requests to do things with external data."
 
 we are going to look at the Chronicling America api, http://chroniclingamerica.loc.gov/about/api/ 
 and use it to construct a topical corpus of newspaper articles.
@@ -83,7 +84,11 @@ Washington,1865
 new column url:
 "http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value + "&date1=" + cells.year.value + "&date2="+ cells.year.value + "&dateFilterType=yearRange&sequence=1&rows=100&format=json"
 
+escape(value, 'url')
+
 new column by fetch json_search.
+
+value.parseJson()["Writer"]
 
 split the items ( parseJson(string s).get("a") ), new column items:
 value.parseJson().items.join(":::")
