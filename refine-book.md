@@ -1,4 +1,4 @@
-# harvest book
+## Example: Shakespeare Sonnets
 
 The Sonnets by William Shakespeare
 http://www.gutenberg.org/ebooks/1105
