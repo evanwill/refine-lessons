@@ -1,13 +1,40 @@
-## Example: Shakespeare Sonnets
+## Example 2: Parsing HTML
 
-The Sonnets by William Shakespeare
-http://www.gutenberg.org/ebooks/1105
+Example 1 demonstrated how to easily fetch a list of URLs and parse JSON. 
+GREL also has a builtin function to easily parse HTML and XML based on [jsoup](https://jsoup.org/).
+This example parses a single web page into a structured table. 
+A similar workflow could be applied to a full list of URLs. 
 
-start from clip board:
-http://www.gutenberg.org/cache/epub/1105/pg1105-images.html
+### Start Sonnets project
 
-create new column by fetch, html
+This example will create an ordered data set from an HTML copy of Shakespeare's [Sonnets](http://www.gutenberg.org/ebooks/1105) from [Project Gutenberg](http://www.gutenberg.org/). Project Gutenberg provides [feeds](http://www.gutenberg.org/wiki/Gutenberg:Feeds) to bulk download their catalog data, so please do not use their public website for web scraping purposes. In this case we are accessing the text of a single HTML book, not scraping the Gutenberg site.
 
+To get started, click the `Open` button in the upper right, which will open a new Refine tab.
+Select `Create project` and Get Data From `Clipboard`. 
+Paste this URL into the text box: `http://www.gutenberg.org/cache/epub/1105/pg1105-images.html`
+
+Click next.
+Refine should automatically identify the content as a Line-based text file, so the default parsing options should be correct.
+Add a descriptive `Project name` at the top right and click `Create project`.
+
+### Fetch HTML
+
+From `Column 1`, create a new column using `edit column` > `Add column by fetching urls`.
+Name the column `html`.
+
+### Clean HTML
+
+The `html` column has the HTML for a full web page containing the Sonnets. 
+Much of it is not Sonnets and must be removed. 
+In some cases, the content of a page will be contained in a handy container `<div>` or `<article>`. 
+However, in this case, the page has no distinctive semantic divisions.
+Each sonnet is contained in a single `<p>` element.
+
+However, the top of the page contains 
+
+could slice value.parseHtml().select("p").slice(40).join("|")
+
+Each sonnet is 
 want to get rid of junk at top, looking at code notice that the first <h1> is the title before the sonnets start, so we can use that as a break point:
 split column html on "<h1" 2 columns
 
