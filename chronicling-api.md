@@ -10,7 +10,7 @@ the API documentation is a like a recipe book, telling us how we can interact wi
 Chronam is full open, no key or account is needed to access the API, and no terms on the use. 
 Other API are often proprietary and restricted, with specific terms of use. 
 
-The documentation tells us the base url is ` http://chroniclingamerica.loc.gov/`. We add additional elements to this url to interact with the API. 
+The documentation tells us the base url is `http://chroniclingamerica.loc.gov/`. We add additional elements to this url to interact with the API. 
 
 build a newspaper corpus:
 - Chronicling America api, http://chroniclingamerica.loc.gov/about/api/ 
