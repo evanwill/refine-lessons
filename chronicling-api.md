@@ -131,6 +131,10 @@ Each of these columns could be further refined using other GREL transformations.
 For example, the `date` column could be converted to a more readable format using `value.toDate("yyyymmdd").toString("yyyy-MM-dd")` or `value.splitByLengths(4,2,2).join("-")`.
 A URL could be constructed to retrieve the full item based on `lccn` using `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells.date.value.splitByLengths(4,2,2).join("-") + "/ed-1/"`.
 
+### Automate
+
+
+
 ### Going further
 
 This data can be enhanced by other services offered via APIs such as geocoding or named entity recognition. 
