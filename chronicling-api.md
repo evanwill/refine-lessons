@@ -1,22 +1,22 @@
 ## Example 1: URL Queries and Parsing JSON
 
 Many cultural institutions provide web APIs enabling users to access data about their collections via simple HTTP requests.
-Refine allows us to create a targeted data set from these resources by constructing the correct request urls and parsing the response.
 This example will explore a simple API provided by the [Chronicling America](http://chroniclingamerica.loc.gov/) project. 
 
 To get started, it is necessary to poke around the web site to understand how the desired content can be harvested.
 Chronicling America provides [documentation](http://chroniclingamerica.loc.gov/about/api/) for their API. 
 However, it is possible to gain further information by viewing the source of the HTML pages. 
-Alternate links in the `<head>` element point to other formats available for the item presented on each page (for example, `<link rel="alternate" type="application/json" href="/lccn/sn86088527/1917-03-29/ed-1/seq-1.json" />`).
+Alternate links in the `<head>` element point to other available formats in addition to the HTML document (for example, `<link rel="alternate" type="application/json" href="/lccn/sn86088527/1917-03-29/ed-1/seq-1.json" />`).
 In this case, the information on each page is available as HTML, Atom-XML, or JSON, depending on the options passed with the URL.
-Finally, a search link `<link title="NDNP Page Search" href="/search/pages/opensearch.xml" rel="search" type="application/opensearchdescription+xml" />` points us to an XML document that provides templates for constructing queries. 
+Finally, a search link `<link title="NDNP Page Search" href="/search/pages/opensearch.xml" rel="search" type="application/opensearchdescription+xml" />` points us to an XML document that provides templates for constructing HTTP search queries. 
 
 > Chronicling America is fully open, no key or account is needed to access the API and there are no limits on the use. 
 > Other APIs are often proprietary and restricted.
 > Please review the specific terms of use before web scraping or using the information in research.
 
-This API documentation is a recipe book explaining how to interact with the server using a public URL.  
+This API documentation is a recipe book explaining how to interact with the server using a public URL.
 To demonstrate interacting with the Chronicling America API using Refine, this example constructs a small full text data set of newspaper front pages.
+Construct the query URL, fetch the information, parse the response.
 
 ### Start Chronicling America project
 
