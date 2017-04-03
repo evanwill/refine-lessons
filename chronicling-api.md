@@ -1,26 +1,27 @@
 ## Example 1: URL Queries and Parsing JSON
 
 Many cultural institutions provide web APIs enabling users to access data about their collections via simple HTTP requests.
-This example will explore a simple API provided by the [Chronicling America](http://chroniclingamerica.loc.gov/) project. 
+This example will use the basic API provided by the [Chronicling America](http://chroniclingamerica.loc.gov/) project to construct a small full text data set of newspaper front pages.
+Refine is used to construct the query URL, fetch the information, and parse the JSON response.
 
-To get started, it is necessary to poke around the web site to understand how the desired content can be harvested.
-Chronicling America provides [documentation](http://chroniclingamerica.loc.gov/about/api/) for their API. 
+To get started, it is necessary to understand how the desired content can be harvested.
+Chronicling America provides [documentation](http://chroniclingamerica.loc.gov/about/api/) for their API and URL patterns. 
 However, it is possible to gain further information by viewing the source of the HTML pages. 
-Alternate links in the `<head>` element point to other available formats in addition to the HTML document (for example, `<link rel="alternate" type="application/json" href="/lccn/sn86088527/1917-03-29/ed-1/seq-1.json" />`).
-In this case, the information on each page is available as HTML, Atom-XML, or JSON, depending on the options passed with the URL.
-Finally, a search link `<link title="NDNP Page Search" href="/search/pages/opensearch.xml" rel="search" type="application/opensearchdescription+xml" />` points us to an XML document that provides templates for constructing HTTP search queries. 
+Alternate links in the `<head>` element point to formats available in addition to the HTML document rendered by your browser (for example, `<link rel="alternate" type="application/json" href="/lccn/sn86088527/1917-03-29/ed-1/seq-1.json" />`).
+In this case, the information on each page can be retrieved as HTML, Atom-XML, or JSON depending on the options passed with the URL.
+Finally, a search link points us to an XML document that provides templates for constructing HTTP search queries (`<link title="NDNP Page Search" href="/search/pages/opensearch.xml" rel="search" type="application/opensearchdescription+xml" />`).
+Together, these hints and documentation are a recipe book explaining how to interact with the server using a public URL.
 
-> Chronicling America is fully open, no key or account is needed to access the API and there are no limits on the use. 
+> Chronicling America is fully open, thus no key or account is needed to access the API and there are no limits on the use. 
 > Other APIs are often proprietary and restricted.
 > Please review the specific terms of use before web scraping or using the information in research.
-
-This API documentation is a recipe book explaining how to interact with the server using a public URL.
-To demonstrate interacting with the Chronicling America API using Refine, this example constructs a small full text data set of newspaper front pages.
-Construct the query URL, fetch the information, parse the response.
 
 ### Start Chronicling America project
 
 To get started, open Refine, select `Create project`, and Get Data From `Clipboard`. 
+
+![]()
+
 Paste this CSV into the text box:
 
 ```
@@ -35,7 +36,7 @@ Add a descriptive `Project name` at the top right and click `Create project`.
 
 ### Construct a query
 
-To construct the API query URL, create a new column by clicking the menu arrow on the `state` column > `edit column` > `Add column based on this column`.
+To construct the query URL, create a new column by clicking the menu arrow on the `state` column > `edit column` > `Add column based on this column`.
 Give the new column the name `url`, then click in the `Expression` text box.
 This box accepts functions written in GREL (General Refine Expression Language, [docs](https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language)) that will be applied to each cell in the existing column when creating values for the new column.
 
@@ -45,7 +46,7 @@ The preview below the expression box should reflex this.
 Delete `value`, and paste this expression:
 
 ```
-"http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value + "&date1=" + cells['year'].value + "&date2="+ cells['year'].value + "&dateFilterType=yearRange&sequence=1&rows=20&format=json"
+"http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value + "&date1=" + cells['year'].value + "&date2="+ cells['year'].value + "&dateFilterType=yearRange&sequence=1&rows=10&format=json"
 ```
 
 The preview should update, and you will now see a URL as output. 
@@ -60,7 +61,7 @@ Examine each component of the expression to understand how it works:
 - `cells['year'].value` is the GREL variable that retrieves the value from a different column in the same row. In this case it is the value listed in the `year` column. 
 
 Much like using the [advanced search form](http://chroniclingamerica.loc.gov/#tab=tab_advanced_search), the value pairs of the query string set the options for the Chronicling America search. 
-The first query URL will ask for newspapers from the Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), returning a max of 20 (`rows=20`) in JSON (`format=json`).
+The first query URL will ask for newspapers from the Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), returning a max of 10 (`rows=10`) in JSON (`format=json`).
 Our second query URL does the same for `Washington`. 
 
 ### Fetch URLs
