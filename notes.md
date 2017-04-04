@@ -9,6 +9,7 @@ The proposed learning outcomes of the lesson are:
 http://programminghistorian.org/new-lesson-workflow#writing-a-new-lesson
 
 include images:
+
 {% include figure.html filename="IMAGE-FILENAME" caption="Caption to image" %}
 
 http://programminghistorian.org/lessons/cleaning-data-with-openrefine

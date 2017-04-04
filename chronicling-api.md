@@ -43,11 +43,6 @@ To construct the query URL, create a new column by clicking the menu arrow on th
 ![add column](images/add_url.png)
 
 Give the new column the name `url`, then click in the `Expression` text box.
-This box accepts functions written in the General Refine Expression Language ([GREL](https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language)) that will be applied to each cell in the existing column to create values for the new column.
-
-Notice that the default expression is `value`, the GREL variable representing the current value of a cell. 
-This means that each cell will be copied to the new column exactly. 
-The preview below the expression box should reflex this.
 Delete `value`, and paste this expression:
 
 ```
@@ -105,14 +100,10 @@ value.parseJson()['items'].join("|||")
 
 GREL `parseJson()` allows us to select an element name to retrieve the corresponding values. 
 In this case selecting `['items']` exposes the array of newspaper records nested inside the JSON response.
-The `join()` function concatenates an array with the given separator resulting in a string value. 
-For example, the expression `[1,2,3].join(";")` will result in the string "1;2;3".  
+The `join()` function concatenates the array with the given separator resulting in a string value.
 Since the newspaper items contain an OCR text field, the strange separator "|||" is necessary to ensure that it is unique.
 
 ![parse json items](images/parse_items.png)
-
-> Notice that GREL variables and functions are strung together in sequence using `.`, starting with the raw cell `value`.
-> This allows complex operations to be constructed by passing the results of each function to the next.
 
 With the newspaper records isolated, individual rows can be created by splitting the cells.
 Click on the `items` column > `edit cells` > `split multivalued cells`, and enter the join used in the last step, `|||`. 
