@@ -1,4 +1,4 @@
-## Example 2: Parsing HTML
+## Example 2: Fetching and Parsing HTML
 
 Example 1 demonstrated how to fetch a list of URLs and parse JSON. 
 GREL also has a builtin function to easily parse HTML and XML based on [jsoup](https://jsoup.org/).

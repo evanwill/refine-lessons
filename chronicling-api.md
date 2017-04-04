@@ -27,6 +27,8 @@ Paste this CSV into the text box:
 ```
 state,year
 Idaho,1865
+Montana,1865
+Oregon,1865
 Washington,1865
 ```
 
@@ -46,7 +48,7 @@ The preview below the expression box should reflex this.
 Delete `value`, and paste this expression:
 
 ```
-"http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value + "&date1=" + cells['year'].value + "&date2="+ cells['year'].value + "&dateFilterType=yearRange&sequence=1&rows=10&format=json"
+"http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value + "&date1=" + cells['year'].value + "&date2="+ cells['year'].value + "&dateFilterType=yearRange&sequence=1&sort=date&rows=5&format=json"
 ```
 
 The preview should update, and you will now see a URL as output. 
@@ -61,8 +63,8 @@ Examine each component of the expression to understand how it works:
 - `cells['year'].value` is the GREL variable that retrieves the value from a different column in the same row. In this case it is the value listed in the `year` column. 
 
 Much like using the [advanced search form](http://chroniclingamerica.loc.gov/#tab=tab_advanced_search), the value pairs of the query string set the options for the Chronicling America search. 
-The first query URL will ask for newspapers from the Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), returning a max of 10 (`rows=10`) in JSON (`format=json`).
-Our second query URL does the same for `Washington`. 
+The first query URL will ask for newspapers from the Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), sorting by date (`sort=date`), returning a max of 5 (`rows=5`) in JSON (`format=json`).
+Our second query URL does the same for `Montana`. 
 
 ### Fetch URLs
 
@@ -70,41 +72,42 @@ The `url` column is now a list of web queries that could be accessed with a brow
 Refine's builtin function to retrieve a list of URLs is done by creating a new column.  
 
 Click on the `url` column > `edit column` > `Add column by fetching urls`.
-Name the new column `json`. 
+Name the new column `fetch`. 
 A `throttle delay` can be set to ensure Refine waits a reasonable amount of time between requests. 
 The default is conservative. 
 Click okay.
 Refine will start requesting the URLs as if you were opening the pages in your browser, and store each response in the cells of the new column.
-After a few seconds, the `json` column should be filled with a JSON data structure. 
+After a few seconds, the `fetch` column should be filled with a JSON data structure. 
 
 ### Parse JSON to get Items
 
-The first elements of the JSON response look like `"totalItems": 52, "endIndex": 20`. 
-This indicates that our search resulted in 52 total items, but the response contains only 20 (since we limited it).
-The Refine project currently contains only two rows, but the two `json` responses contain information about a total of 40 newspaper pages nested in the JSON `items` element. 
+The first elements of the JSON response look like `"totalItems": 52, "endIndex": 5`. 
+This indicates that our search resulted in 52 total items, but the response contains only 5 (since it was limited by the `rows=5` option).
+The Refine project currently has only four rows, but the `fetch` column contains information about a total of 20 newspaper pages nested in the JSON `items` element. 
 Thus, to construct a orderly data set, it is necessary to parse the JSON and split each item into its own row.
 
 GREL has a builtin function to easily parse JSON. 
-Click on the `json` column > `edit column` > `Add column based on this column`. 
+Click on the `fetch` column > `edit column` > `Add column based on this column`. 
 Name the column `items` and enter the expression:
 
 ```
-value.parseJson()['items'].join(":::")
+value.parseJson()['items'].join("|||")
 ```
 
-GREL `parseJson()` allows us to select an element `['items']`, in this case exposing the array of newspaper records nested inside the JSON response.
-The `join()` function concatenates an array with the given separator. For example, the expression `[1,2,3].join(";")` will result in "1;2;3".  
-Since the newspaper items contain an OCR text field, the strange separator ":::" is necessary to ensure that it is unique.
+GREL `parseJson()` allows us to select a name to retrieve the corresponding values. 
+In this case selecting `['items']` exposes the array of newspaper records nested inside the JSON response.
+The `join()` function concatenates an array with the given separator. For example, the expression `[1,2,3].join(";")` will result in the string "1;2;3".  
+Since the newspaper items contain an OCR text field, the strange separator "|||" is necessary to ensure that it is unique.
 
-> Notice that variables and functions are strung together in sequence using `.`, starting with the raw cell `value`.
+> Notice that GREL variables and functions are strung together in sequence using `.`, starting with the raw cell `value`.
 > This allows complex operations to be constructed by passing the results of each function to the next.
 
 With the newspaper records isolated, individual rows can be created by splitting the cells.
-Click on the `items` column > `edit cells` > `split multivalued cells`, and enter the join used in the last step, `:::`. 
+Click on the `items` column > `edit cells` > `split multivalued cells`, and enter the join used in the last step, `|||`. 
 
 Each of the cells in the `items` column are now split into multiple rows. 
-The top the table should read 40 rows.
-If you click on Show as `records`, it will read 2, representing our original CSV rows.
+The top the table should read 20 rows.
+If you click on Show as `records`, it will read 4, representing our original CSV rows.
 Click back on `rows`.
 
 So far in this example, most operations result in creating new columns. 
@@ -113,12 +116,12 @@ However, at this point all the necessary information is contained in the `items`
 It is a good time to clean up the unnecessary columns.
 Click on the `all` column > `Edit columns` > `Re-order / remove columns`. 
 Drag the unnecessary column names to the right side, then click `ok` to remove them. 
-With the original columns removed, both `records` and `rows` will read 40.
+With the original columns removed, both `records` and `rows` will read 20.
 
 ### Parse JSON values
 
 To complete the data set, it is necessary to parse each newspaper's JSON record into individual columns. 
-This is a very common task, as most web APIs return information in JSON format.
+This is a very common task, as many web APIs return information in JSON format.
 Again, GREL's `parseJson()` function make this easy. 
 For each JSON key, create a new column from `items`, parse the JSON, and select the key:
 
@@ -128,13 +131,19 @@ For each JSON key, create a new column from `items`, parse the JSON, and select 
 - lccn: `value.parseJson()['lccn']`
 - text: `value.parseJson()['ocr_eng']`
 
+After the desired information is extracted, the `items` column can be removed using `Edit column` > `Remove this column`. 
 Each of these columns could be further refined using other GREL transformations.
 For example, the `date` column could be converted to a more readable format using `value.toDate("yyyymmdd").toString("yyyy-MM-dd")` or `value.splitByLengths(4,2,2).join("-")`.
 A URL could be constructed to retrieve the full item based on `lccn` using `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells.date.value.splitByLengths(4,2,2).join("-") + "/ed-1/"`.
 
 ### Automate
 
-
+```
+state,year
+Iowa,1900
+Minnesota,1900
+Wisconsin,1900
+```
 
 ### Going further
 
