@@ -85,6 +85,11 @@ Thus, the final expression to create the `parse` column is:
 
 Click Ok to create the column.
 
+> Notice how it is possible to gradually build up an expression while checking the preview to see the result.
+> Refine is visual and iterative. 
+> Test out a transformation to see what happens--it is very easy to undo! 
+> The full history of operations is recorded in the `Undo / Redo` tab. 
+
 ### Split Cells
 
 The `parse` column now contains all the sonnets separated by "|", but the project still contains only one row. 
@@ -113,7 +118,7 @@ Transform will overwrite the cells of the current column rather than creating a 
 In the expression box, type `value.parseHtml()`.
 Notice that the preview shows a complete HTML tree starting with the `<html>` element.
 It is important to note that `parseHtml()` will automatically fill in missing tags, allowing it to parse these cell values despite not being valid HTML documents.
-To extract the sonnet text, select the `p` tag, add an index number, and the function `innerHtml()`:
+Select the `p` tag, add an index number, and use the function `innerHtml()` to extract the sonnet text:
 
 `value.parseHtml().select("p")[0].innerHtml()`
 
@@ -122,7 +127,7 @@ Click Ok to transform all 154 cells in the column using the expression.
 ![transform cells innerHtml](images/refine-innerhtml.png)
 
 > In the expression above `select` returns an array of `p` elements even though there is only one in each cell.
-> An index number is necessary to select the first (and only) item in the array because `innerHtml` takes a single HTML element as input.  
+> An index number is necessary to select the first (and only) item in the array because `innerHtml` takes a single HTML element as input.
 > Attempting to pass an array to `innerHtml` will raise an error.
 > Keep data object types in mind when debugging GREL expressions!
 
