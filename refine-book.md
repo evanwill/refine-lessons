@@ -31,7 +31,7 @@ Click on the menu arrow of *Column 1* > *Edit column* > *Add column by fetching 
 ![Add column by fetch](images/refine-fetch1.png)
 
 Name the new column `fetch`. 
-The *throttle delay* option sets a pause time between requests to avoid bombarding a server.
+The *throttle delay* option sets a pause time between requests to avoid being blocked by a server.
 The default is conservative. 
 After clicking okay, Refine will start requesting the URLs from the base column as if you were opening the pages in your browser, and will store each response in the cells of the new column.
 In this case, there is one URL in *Column 1* resulting in one cell in the *fetch* column containing the full source for the Sonnets web page. 

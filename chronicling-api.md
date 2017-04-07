@@ -108,7 +108,7 @@ With the original columns removed, both *records* and *rows* will read 20.
 ### Parse JSON values
 
 To complete the data set, it is necessary to parse each newspaper's JSON record into individual columns. 
-This is a very common task, as many web APIs return information in JSON format.
+This is a common task, as many web APIs return information in JSON format.
 Again, GREL's `parseJson()` function makes this easy. 
 For each JSON key, create a new column from *items* by parsing the JSON and selecting the key:
 
@@ -120,11 +120,20 @@ For each JSON key, create a new column from *items* by parsing the JSON and sele
 
 After the desired information is extracted, the *items* column can be removed using *Edit column* > *Remove this column*. 
 
-Each of these columns could be further refined using other GREL transformations.
+Each column could be further refined using other GREL transformations.
 For example, to convert the date to a more readable format, use GREL date functions.
 Click on the *date* column > *Edit cells* > *Transform* and use the expression `value.toDate("yyyymmdd").toString("yyyy-MM-dd")`.
-A link to the full item can be constructed based on the *lccn*.
-On *lccn* column > *Edit column* > *Add column based on this column* and use the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1/"`.
+
+Another common workflow is to use the attributes to construct further URL queries extending the data.
+For example, a link to the full issue information can be constructed based on the *lccn*.
+On *lccn* column > *Edit column* > *Add column based on this column* and use the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"`.
+Fetching this URL returns a complete list of the issue's pages, which could then be harvested. 
+
+Now you are ready to enjoy reading the front pages of the NW in 1865!
+
+> This data can be enhanced by other services offered via APIs such as geocoding or named entity recognition. 
+> Some extensions, such as [Refine-NER-Extension](https://github.com/RubenVerborgh/Refine-NER-Extension), help automate enhancing the data by reconciling with remote sources. > However, since many of the APIs are from commercial companies, (often proprietary and restricted, with specific terms of use) the implementation details regularly change, making these extensions difficult to maintain.
+> Add to a map using [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro)
 
 ### Automate
 
@@ -136,8 +145,3 @@ Iowa,1900
 Minnesota,1900
 Wisconsin,1900
 ```
-
-### Going further
-
-This data can be enhanced by other services offered via APIs such as geocoding or named entity recognition. 
-Some extensions, such as [Refine-NER-Extension](https://github.com/RubenVerborgh/Refine-NER-Extension), help automate enhancing the data by reconciling with remote sources. However, since many of the APIs are from commercial companies, (often proprietary and restricted, with specific terms of use) the implementation details regularly change, making these extensions difficult to maintain.
