@@ -1,3 +1,10 @@
+## Advanced APIs
+
+
+> This data can be enhanced by other services offered via APIs such as geocoding or named entity recognition. 
+> Some extensions, such as [Refine-NER-Extension](https://github.com/RubenVerborgh/Refine-NER-Extension), help automate enhancing the data by reconciling with remote sources. > However, since many of the APIs are from commercial companies, (often proprietary and restricted, with specific terms of use) the implementation details regularly change, making these extensions difficult to maintain.
+> Add to a map using [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro)
+
 Refine's Fetch can only GET, not HTTP POST
 
 to POST in Refine it is possible to use Jython in the expression window instead of GREL.

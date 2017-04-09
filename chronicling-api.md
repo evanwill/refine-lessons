@@ -2,18 +2,17 @@
 
 Many cultural institutions provide web APIs enabling users to access information about their collections via simple HTTP requests.
 This example will harvest data from the [Chronicling America](http://chroniclingamerica.loc.gov/) project to collect a small set of newspaper front pages with full text.
-Refine is used to construct the query URL, fetch the information, and parse the JSON response.
+Following common web scraping workflow, Refine is used to construct the query URL, fetch the information, and parse the JSON response.
 
 > Chronicling America is fully open, thus no key or account is needed to access the API and there are no limits on the use. 
 > Other APIs are often proprietary and restricted.
 > Please review the specific terms of use before web scraping or using the information in research.
->
-> Information about alternative formats and search API are sometimes given in the `<head>` element of a web page. 
-> Check for `<link rel="alternate"...`, `<link rel="search"...`, or `<!--` comments which provide hints on how to interact with the site.
 
 ### Start Chronicling America Project
 
-To get started after completing Example 1, click the *Open* button in the upper right, which will open a new start tab.
+To get started after completing Example 1, click the *Open* button in the upper right.
+A new tab will open with the Refine start project view. 
+The tab with the *Example 1* project can be left open without impacting performance.
 Select *Create project*, and Get Data From *Clipboard*. 
 Paste this CSV into the text box:
 
@@ -54,9 +53,12 @@ The values from the cells of the table are accessed using GREL variables.
 The current value of each cell in *state* column is represented by `value`.
 Values from the same row in other columns can be retrieved using `cells['column name'].value`. 
 Thus `cells['year'].value` in row 1 will return "1865" from the *year* column.
-The `escape()` function is added to each to ensure the string is useable in a URL (basically the opposite of the `unescape()` function introduced in Example 1). 
+The `escape()` function is added to ensure the string is useable in a URL (basically the opposite of the `unescape()` function introduced in Example 1). 
  
 Explicitly, the first query URL will ask for newspapers from Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), sorting by date (`sort=date`), returning a maximum of five (`rows=5`) in JSON (`format=json`). 
+
+> In addition to formal documentation, information about alternative formats and search API are sometimes given in the `<head>` element of a web page. 
+> Check for `<link rel="alternate"...`, `<link rel="search"...`, or `<!--` comments which provide hints on how to interact with the site.
 
 ### Fetch URLs
 
@@ -64,16 +66,16 @@ The *url* column is a list of web queries that could be accessed with a browser.
 To test, click on a link, which will open it in a new tab.
 Fetch the URLs using *url* column *Edit column* > *Add column by fetching urls*.
 Name the new column `fetch`. 
-In a few seconds, the operation should complete and the *fetch* column will be filled with JSON data.
+In a few seconds, the operation should complete and the *fetch* column will be filled with [JSON](http://www.json.org/) data.
 
 ### Parse JSON to Get Items
 
-The first elements of the JSON response look like `"totalItems": 52, "endIndex": 5`. 
+The first *name/value* pairs of the query response look like `"totalItems": 52, "endIndex": 5`. 
 This indicates that the search resulted in 52 total items, but the response contains only five (since it was limited by the `rows=5` option).
-The Refine project currently has four rows, but the `fetch` column contains information about a total of twenty newspaper pages nested in the JSON `items` element. 
-To construct a orderly data set, it is necessary to parse the JSON and split each item into its own row.
+The JSON key `items` contains an array of the individual newspapers returned by the search.
+To construct a orderly data set, it is necessary to parse the JSON and split each newspaper into its own row.
 
-GREL's `parseJson()` function allows us to select an element name to retrieve the corresponding values.
+GREL's `parseJson()` function allows us to select a key name to retrieve the corresponding values.
 Click on the *fetch* column > *Edit column* > *Add column based on this column*. 
 Name the column `items` and enter the expression:
 
@@ -110,7 +112,7 @@ With the original columns removed, both *records* and *rows* will read 20.
 To complete the data set, it is necessary to parse each newspaper's JSON record into individual columns. 
 This is a common task, as many web APIs return information in JSON format.
 Again, GREL's `parseJson()` function makes this easy. 
-For each JSON key, create a new column from *items* by parsing the JSON and selecting the key:
+Create a new column from *items* for each newspaper metadata element by parsing the JSON and selecting the key:
 
 - date, `value.parseJson()['date']`
 - title, `value.parseJson()['title']`
@@ -121,27 +123,12 @@ For each JSON key, create a new column from *items* by parsing the JSON and sele
 After the desired information is extracted, the *items* column can be removed using *Edit column* > *Remove this column*. 
 
 Each column could be further refined using other GREL transformations.
-For example, to convert the date to a more readable format, use GREL date functions.
+For example, to convert the date to a more readable format, use [date functions](https://github.com/OpenRefine/OpenRefine/wiki/GREL-Date-Functions).
 Click on the *date* column > *Edit cells* > *Transform* and use the expression `value.toDate("yyyymmdd").toString("yyyy-MM-dd")`.
 
-Another common workflow is to use the attributes to construct further URL queries extending the data.
-For example, a link to the full issue information can be constructed based on the *lccn*.
+Another common workflow is to extend the data with further URL queries.
+For example, a link to the full issue information can be created based on the *lccn*.
 On *lccn* column > *Edit column* > *Add column based on this column* and use the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"`.
 Fetching this URL returns a complete list of the issue's pages, which could then be harvested. 
 
-Now you are ready to enjoy reading the front pages of the NW in 1865!
-
-> This data can be enhanced by other services offered via APIs such as geocoding or named entity recognition. 
-> Some extensions, such as [Refine-NER-Extension](https://github.com/RubenVerborgh/Refine-NER-Extension), help automate enhancing the data by reconciling with remote sources. > However, since many of the APIs are from commercial companies, (often proprietary and restricted, with specific terms of use) the implementation details regularly change, making these extensions difficult to maintain.
-> Add to a map using [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro)
-
-### Automate
-
-This routine can easily be reused on the 
-
-```
-state,year
-Iowa,1900
-Minnesota,1900
-Wisconsin,1900
-```
+The headlines of 1865 from the Northwest are ready to enjoy!
