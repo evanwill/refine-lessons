@@ -1,9 +1,32 @@
 ## Advanced APIs
 
+*Example 2* demonstrated working with a simple API using Refine's fetch function, essentially using URL patterns to request information from a server. 
+Refine's fetch can only use HTTP GET, meaning the query is encoded in the URL string, thus limited in length (2048 ASCII characters), complexity, and security.
+However, many API services that could be used to enhance text data, such as geocoding or named entity recognition, use HTTP POST to transfer information to the server for processing. 
+They may also require authentication headers send with the request. 
+
+This type of API is often demonstrated using [curl](https://curl.haxx.se/), for example: `curl -d "text=what is sentiment of this sentence?" http://text-processing.com/api/sentiment/`.
+GREL does not have a built in function to reproduce this request.
+However, the language of the expression window can be changed to [Jython](http://www.jython.org/) or [Clojure](https://clojure.org/) which are more complete scripting languages.
+Keep in mind that spending more time writing complex scripts moves away from the strength of Refine. 
+If it is necessary to develop a complex Jython routine, it will likely be better to do it directly in Python in Jupyter Notebook which preserves some of the iterative, exploratory interactivity of Refine.
+However, it is fairly simple to implement a POST request using Jython, which 
+
+
+
+http://text-processing.com/docs/sentiment.html
+
+import urllib2, urllib
+url = 'http://text-processing.com/api/sentiment/'
+params = urllib.urlencode({'text': 'some angry text test'})
+req = urllib2.Request(url,params)
+f = urllib2.urlopen(req)
+d = f.read()
+return d
+
 
 > This data can be enhanced by other services offered via APIs such as geocoding or named entity recognition. 
 > Some extensions, such as [Refine-NER-Extension](https://github.com/RubenVerborgh/Refine-NER-Extension), help automate enhancing the data by reconciling with remote sources. > However, since many of the APIs are from commercial companies, (often proprietary and restricted, with specific terms of use) the implementation details regularly change, making these extensions difficult to maintain.
-> Add to a map using [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/intro)
 
 Refine's Fetch can only GET, not HTTP POST
 
