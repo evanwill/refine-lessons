@@ -4,7 +4,7 @@
 Refine's fetch can only use the HTTP GET protocol, meaning the query is encoded in the URL string, thus limited in length (2048 ASCII characters), complexity, and security.
 Many API services that could be used to enhance text data, such as [geocoding](https://en.wikipedia.org/wiki/Geocoding) or [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition), use HTTP POST to transfer information to the server for processing. 
 GREL does not have a built in function to use this type of API.
-However, the language of the expression window can be changed to [Jython](http://www.jython.org/), providing a more complete scripting environment where it is fairly simple to implement a POST request.
+However, the expression window language can be changed to [Jython](http://www.jython.org/), providing a more complete scripting environment where it is fairly simple to implement a POST request.
 
 > [Jython](http://www.jython.org/) is Python implemented for the Java VM and comes bundled with Refine (see the `.jar` file in `openrefine-2.7-rc.2/webapp/jython/`).
 > The current version is Jython 2.7, based on [Python 2.7](https://docs.python.org/2.7/).
@@ -25,7 +25,7 @@ Select *Python / Jython* from the list.
 Notice that the preview now shows `null` for the output. 
 A Jython expression in Refine must have a `return` statement to add the output to the new cells in the transformation.
 Replace `value` with `return value`, simply copying the current cells. 
-The basic GREL variables can be used, however use brackets instead of periods in Jython, for example GREL `cells['last'].value` would be Jython `cells['last']['value']`. 
+The basic GREL variables can be used in Jython by substituting brackets instead of periods, for example GREL `cells['last'].value` would be Jython `cells['last']['value']`. 
 
 ![jython expression](images/refine-jython.png)
 
