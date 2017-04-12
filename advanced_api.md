@@ -4,7 +4,7 @@
 This workflow uses the HTTP GET protocol, meaning the query is encoded in the URL string, thus limited in length (2048 ASCII characters), complexity, and security.
 Many API services that could be used to enhance text data, such as [geocoding](https://en.wikipedia.org/wiki/Geocoding) or [named entity recognition](https://en.wikipedia.org/wiki/Named-entity_recognition), use HTTP POST to transfer information to the server for processing. 
 GREL does not have a built in function to use this type of API.
-However, the expression window language can be changed to [Jython](http://www.jython.org/), providing a more complete scripting environment where it is fairly simple to implement a POST request.
+However, the expression window language can be changed to [Jython](http://www.jython.org/), providing a more complete scripting environment where it is possible to implement a POST request.
 
 > [Jython](http://www.jython.org/) is Python implemented for the Java VM and comes bundled with Refine (look for the `.jar` file in `openrefine-2.7-rc.2/webapp/extensions/jython/`).
 > The [official documentation](https://github.com/OpenRefine/OpenRefine/wiki/Jython) is sparse.
@@ -16,7 +16,7 @@ However, the expression window language can be changed to [Jython](http://www.jy
 ### Jython in the expression window
 
 Return to the Sonnets project completed in *Example 1*. 
-If the tab was closed, click *Open* > *Open Project* and find the Sonnets example. 
+If the tab was closed, click *Open* > *Open Project* and find the Sonnets example (Refine saves everything for you!). 
 
 On the *first* column > *Edit column* > *Add column based on this column*.
 On the right side of the *Expression* box is a drop down to change the expression language.
@@ -27,31 +27,30 @@ Select *Python / Jython* from the list.
 Notice that the preview now shows `null` for the output. 
 A Jython expression in Refine must have a `return` statement to add the output to the new cells in the transformation.
 Replace the default GREL expression `value` with `return value`. 
-The preview will update showing the output copying the current cells. 
+The preview will update showing the current cells copied to the output. 
 The basic [GREL variables](https://github.com/OpenRefine/OpenRefine/wiki/Variables) can be used in Jython by substituting brackets instead of periods. 
 For example, the GREL `cells.last.value` would be Jython `cells['last']['value']`. 
 
 ### Jython GET request
 
 To create a HTTP request in Jython, use the standard library [urllib2](http://www.jython.org/docs/library/urllib2.html).
-The fetch column function can be recreated with Jython to demonstrate an HTTP GET request. 
+The Refine's fetch function can be recreated with Jython to demonstrate the basics of the library. 
 In the expression box, type:
 
 ```
 import urllib2
-url = "http://www.jython.org/"
-fetch = urllib2.urlopen(url)
+fetch = urllib2.urlopen("http://www.jython.org/")
 return fetch.read()
 ```
 
-The preview should display the HTML source of the Jython home page.
+The preview should display the HTML source of the Jython home page, this is an HTTP GET request as in previous fetch examples.
 Notice that similar to opening and reading a text file in Python, `urllib2.urlopen()` returns a file-like object that must be `read()` into a string.
-The `url` variable could use `value` to construct a query URL similar to the fetch used in *Example 2*.
+The URL could be replaced with `value` to construct a query URL similar to the fetch used in *Example 2*.
 If necessary, a throttle delay can be added by importing `time` and adding `time.sleep(15)` to the script. 
 
 ### POST request
 
-To create a POST request, add data to the urllib2 request object. 
+Urllib2 will automatically send a POST request if data is added to the request object.
 For example, [text-processing.com](http://text-processing.com/) provides free natural language processing APIs based on the [Python NLTK](http://www.nltk.org/).
 The documentation for the [Sentiment Analysis](http://text-processing.com/docs/sentiment.html) service says to send an HTTP POST request "with form encoded data containing the `text` you want to analyze." 
 This type of API is often demonstrated using [curl](https://curl.haxx.se/) on the commandline.

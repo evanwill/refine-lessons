@@ -6,13 +6,13 @@ Building on those essential data wrangling skills, this lesson focuses on Refine
 Examples introduce some of the advanced features to transform and enhance a data set including: 
 
 - fetch URLs using Refine
-- construct URLs to retrieve information from a simple web API
+- construct URL queries to retrieve information from a simple web API
 - parse HTML and JSON responses to extract relevant data
 - use array functions to manipulate string values
 
 ### Why Use OpenRefine?
 
-The ability to create data sets from unstructured documents available on the web opens possibilities for research using digitized primary materials, web archives, and contemporary media streams. 
+The ability to create data sets from unstructured documents available on the web opens possibilities for research using digitized primary materials, web archives, texts, and contemporary media streams. 
 Programming Historian lessons introduce a number of methods to gather and interact with this content, from [wget](http://programminghistorian.org/lessons/applied-archival-downloading-with-wget) to [Python](http://programminghistorian.org/lessons/intro-to-beautiful-soup).
 When working with text documents, Refine is particularly suited for this task, allowing users to fetch urls and directly process the results in an iterative, exploratory manner.
 
@@ -36,6 +36,7 @@ Because of this flexibility it has been embraced by [journalists](https://www.pr
 
 ### Examples
 
-This lesson presents two examples demonstrating workflows to harvest and process data from the web.
+This lesson presents three examples demonstrating workflows to harvest and process data from the web.
 First, "Fetching and Parsing HTML" introduces functions to parse an HTML document into a structured data set.
 Second, "URL Queries and Parsing JSON" introduces interacting with a simple web API to construct a full text data set of historic newspaper front pages. 
+Finally, "Advanced APIs" demonstrates using Jython to implement a POST request to a natural language processing web service API.

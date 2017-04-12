@@ -1,11 +1,12 @@
 ## Example 2: URL Queries and Parsing JSON
 
 Many cultural institutions provide web APIs enabling users to access information about their collections via simple HTTP requests.
+These sources enable new queries and aggregations of text that were previously impossible, cutting across boundaries of repositories and collections to enable large scale analysis of both content and metadata.
 This example will harvest data from the [Chronicling America](http://chroniclingamerica.loc.gov/) project to collect a small set of newspaper front pages with full text.
-Following common web scraping workflow, Refine is used to construct the query URL, fetch the information, and parse the JSON response.
+Following a common web scraping workflow, Refine is used to construct the query URL, fetch the information, and parse the JSON response.
 
 > Chronicling America is fully open, thus no key or account is needed to access the API and there are no limits on the use. 
-> Other APIs are often proprietary and restricted.
+> Other aggregators are often proprietary and restricted.
 > Please review the specific terms of use before web scraping or using the information in research.
 
 ### Start Chronicling America Project
