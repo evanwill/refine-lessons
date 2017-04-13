@@ -18,7 +18,7 @@ However, the expression window language can be changed to [Jython](http://www.jy
 Return to the Sonnets project completed in *Example 1*. 
 If the tab was closed, click *Open* > *Open Project* and find the Sonnets example (Refine saves everything for you!). 
 
-On the *first* column > *Edit column* > *Add column based on this column*.
+On the *first* column > *Edit column* > *Add column based on this column*, and name the new column `sentiment`.
 On the right side of the *Expression* box is a drop down to change the expression language.
 Select *Python / Jython* from the list.
 
@@ -34,99 +34,106 @@ For example, the GREL `cells.last.value` would be Jython `cells['last']['value']
 ### Jython GET request
 
 To create a HTTP request in Jython, use the standard library [urllib2](http://www.jython.org/docs/library/urllib2.html).
-The Refine's fetch function can be recreated with Jython to demonstrate the basics of the library. 
+Refine's fetch function can be recreated with Jython to demonstrate the basics of the library. 
 In the expression box, type:
 
 ```
 import urllib2
-fetch = urllib2.urlopen("http://www.jython.org/")
-return fetch.read()
+get = urllib2.urlopen("http://www.jython.org/")
+return get.read()
 ```
 
 The preview should display the HTML source of the Jython home page, this is an HTTP GET request as in previous fetch examples.
-Notice that similar to opening and reading a text file in Python, `urllib2.urlopen()` returns a file-like object that must be `read()` into a string.
-The URL could be replaced with `value` to construct a query URL similar to the fetch used in *Example 2*.
-If necessary, a throttle delay can be added by importing `time` and adding `time.sleep(15)` to the script. 
+Notice that similar to opening and reading a text file with Python, `urlopen()` returns a file-like object that must be `read()` into a string.
+The URL could be replaced with `value` to construct a query similar to the fetch used in *Example 2*.
+If necessary, a throttle delay can be implemented by importing `time` and adding `time.sleep(15)` to the script. 
 
 ### POST request
 
-Urllib2 will automatically send a POST request if data is added to the request object.
-For example, [text-processing.com](http://text-processing.com/) provides free natural language processing APIs based on the [Python NLTK](http://www.nltk.org/).
-The documentation for the [Sentiment Analysis](http://text-processing.com/docs/sentiment.html) service says to send an HTTP POST request "with form encoded data containing the `text` you want to analyze." 
+Urllib2 will automatically send a POST if data is added to the request object.
+For example, [Text Processing](http://text-processing.com/) provides natural language processing APIs based on [Python NLTK](http://www.nltk.org/).
+The documentation for the [Sentiment Analysis service](http://text-processing.com/docs/sentiment.html) provides a base URL and the name of the key (`text`) used for the data to be analyzed.
+No authentication is required and 1,000 calls per day are free.
 This type of API is often demonstrated using [curl](https://curl.haxx.se/) on the commandline.
-The documentation gives the example `curl -d "text=great" http://text-processing.com/api/sentiment/` which can be recreated in Jython to test the service:
+In this case, the example is `curl -d "text=great" http://text-processing.com/api/sentiment/` which can be recreated in Jython to test the service.
+Building on the GET expression above, the POST data is added as the second parameter of *urlopen*, thus the request will be in the form `urllib2.urlopen(url,data)`.
+Type this script into the expression window:
 
 ```
 import urllib2
-url = "http://text-processing.com/api/sentiment/"
-post = urllib2.urlopen(url,"text=what is the sentiment of this sentence?")
+post = urllib2.urlopen("http://text-processing.com/api/sentiment/", "text=what is the sentiment of this sentence?")
 return post.read()
 ```
 
 The preview should show a JSON response with sentiment probability values.
-To retrieve sentiment analysis data for the first lines of the sonnets, put this basic Jython pattern together with the values of the cells.
-The API documentation gives the base URL and the name for the key (`text`) used for the data.
-The code is in a non-compact form to demonstrate each step.
+To retrieve sentiment analysis data for the first lines of the sonnets (remember we are still adding a column based on *first*!), put this basic Jython pattern together with the values of the cells.
+Paste this script into the expression window:
+
+```
+import urllib2
+url = "http://text-processing.com/api/sentiment/"
+data = "text=" + value
+post = urllib2.urlopen(url, data)
+return post.read()
+```
+
+![jython request](images/refine-jython-request.png)
+
+Click *Ok* and the Jython script will run for every row in the column.
+The JSON response can then be parsed using the methods demonstrated in *Example 2*.
+Given the small expression window and uniform data, the script above is pragmatically simplified and compressed.
+If Refine is encountering problems, it is better to implement a more complete script with error handling.
+For example, the POST request script could be rewritten:
 
 ```
 import urllib2, urllib
 url = "http://text-processing.com/api/sentiment/"
-data = urllib.urlencode({"text": value})
+data = urllib.urlencode({"text": value.encode("utf-8")})
 req = urllib2.Request(url,data)
-post = urllib2.urlopen(query)
-response = request.read()
-return response
-```
-
-```
-from urllib2 import Request, urlopen, URLError
-from urllib import urlencode
-url = "http://text-processing.com/api/sentiment/"
-data = urlencode({"text": value})
-req = Request(url,data)
 try:
-    post = urlopen(req)
-except URLError as e:
+    post = urllib2.urlopen(req)
+except urllib2.URLError as e:
     if hasattr(e, "reason"):
         return "Failed: ", e.reason
     elif hasattr(e, "code"):
         return "Error code: ", e.code
 else:
-    return post.read()
+    response = post.read()
+    return response
 ```
 
-![jython request](images/refine-jython-request.png)
+this API allows 1000 per day per IP address.
 
-Click *Ok* to run the Jython script for every row in the column.
-The JSON response can then be parsed using the methods demonstrated in *Example 2*.
-this API allows 1000 per day per IP address. 
+> Some APIs require headers with authentication tokens to be passed with the POST request. 
+> Headers can be added as the third parameter of `urllib2.Request()` similar to how data was added in the example above.
+> Check the Python [urllib2 documentation](https://docs.python.org/2/library/urllib2.html) and [how-to](https://docs.python.org/2/howto/urllib2.html) for advanced options.
+> When harvesting web content, character encoding issues commonly produce errors in Python. 
+> Trimming whitespace, using GREL `escape()` / `unescape()`, or Jython `encode("utf-8")` will often fix the problem.
 
-Compare with another sentiment analysis service, http://sentiment.vivekn.com/docs/api/
-In this case the docs say base url http://sentiment.vivekn.com/api/text/ and key `txt`. 
+### Compare sentiment
+
+To practice constructing a POST request, read the documentation for [Sentiment Tool](http://sentiment.vivekn.com/docs/api/), another free API.
+Find the service URL and data key necessary to modify the Jython pattern above.
+Create a new column from *first* named `sentiment2` and test the script.
+There are many ways to write it, for example:
 
 ```
 import urllib2
 url = "http://sentiment.vivekn.com/api/text/"
-return urllib2.urlopen(url,"txt="+value).read()
+data = "txt=" + value
+post = urllib2.urlopen(url, data)
+return post.read()
 ```
 
-These are very simple free APIs for demonstration purposes. 
-pay attention to what the models are trained on. both are trained on movie reviews, thus optimized for small bits of text with language similar to a review. 
-OpenCalais is trained on news.
-We should be asking questions about the alogrithms to understand the metrics they are capable of producing, and bias and limitations built in.
+The JSON response contains different metrics, but it will be obvious that the APIs disagree on many of the sentiment *labels*. 
+These are simple free APIs for demonstration purposes, but it is important to critically investigate services to more fully understand the potential of the metrics.
+Both APIs use a [naive bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) to categorize text input.
+These models must be trained on pre-labeled data and will be most accurate on similar text.
+Text Processing is trained on twitter and movie review corpus[^1], while Sentiment Tool is trained on IMDb movie reviews.[^2]
+Thus both are optimized for small bits of modern English language similar to a review.
+The models are unlikely to produce quality results for sonnets filled with archaic words and phrases.
+In humanities we should be asking questions about the algorithms and thinking critically about the metrics they are capable of producing. 
+This is not a new technical skill, but an application of the historian's traditional expertise, not unlike unraveling the bias and limitations of physical primary source materials.
 
-> Some extensions, such as [Refine-NER-Extension](https://github.com/RubenVerborgh/Refine-NER-Extension), help automate enhancing the data by reconciling with remote sources. 
-> However, since many of the APIs are from commercial companies, (often proprietary and restricted, with specific terms of use) the implementation details regularly change, making these extensions difficult to maintain.
-
-> if you have errors, you may need to `value.escape('xml')` first
-
-They may also require authentication headers send with the request. 
-
-by default, the second parameter is the data that you want to pass along with the request. Instead, you have to specify that you want to pass headers.
-import urllib2
-url = 'https://api.fitbit.com/1/user/-/activities/heart/date/2016-6-14/1d/1sec/time/00:00/23:59.json'
-hdr = {'Authorization': 'Bearer (token)'}
-req = urllib2.Request(url,headers=hdr)
-f = urllib2.urlopen(req)
-
-https://docs.python.org/2/howto/urllib2.html
+[^1]: Jacob Perkins, "Sentiment Analysis with Python NLTK Text Classification", http://text-processing.com/demo/sentiment/
+[^2]: Vivek Narayanan, Ishan Arora, Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, [arXiv:1305.6143](https://arxiv.org/abs/1305.6143).
