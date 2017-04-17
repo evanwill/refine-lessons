@@ -7,6 +7,7 @@ GREL does not have a built in function to use this type of API.
 However, the expression window language can be changed to [Jython](http://www.jython.org/), providing a more complete scripting environment where it is possible to implement a POST request.
 
 > [Jython](http://www.jython.org/) is Python implemented for the Java VM and comes bundled with Refine (look for the `.jar` file in `openrefine-2.7-rc.2/webapp/extensions/jython/`).
+> This means Python 2 scripts can be written or loaded into the expression window.
 > The [official documentation](https://github.com/OpenRefine/OpenRefine/wiki/Jython) is sparse.
 > The current version is Jython 2.7, based on [Python 2.7](https://docs.python.org/2.7/), and can be extended with non-standard libraries using a [work around](https://github.com/OpenRefine/OpenRefine/wiki/Extending-Jython-with-pypi-modules).
 > Keep in mind that spending time writing complex scripts moves away from the strengths of Refine. 
@@ -18,7 +19,7 @@ However, the expression window language can be changed to [Jython](http://www.jy
 Return to the Sonnets project completed in *Example 1*. 
 If the tab was closed, click *Open* > *Open Project* and find the Sonnets example (Refine saves everything for you!). 
 
-On the *first* column > *Edit column* > *Add column based on this column*, and name the new column `sentiment`.
+Add a new column based on the *first* column named `sentiment`.
 On the right side of the *Expression* box is a drop down to change the expression language.
 Select *Python / Jython* from the list.
 
@@ -53,7 +54,7 @@ If necessary, a throttle delay can be implemented by importing `time` and adding
 Urllib2 will automatically send a POST if data is added to the request object.
 For example, [Text Processing](http://text-processing.com/) provides natural language processing APIs based on [Python NLTK](http://www.nltk.org/).
 The documentation for the [Sentiment Analysis service](http://text-processing.com/docs/sentiment.html) provides a base URL and the name of the key (`text`) used for the data to be analyzed.
-No authentication is required and 1,000 calls per day are free.
+No authentication is required and 1,000 calls per day are free (as of April 2017).
 This type of API is often demonstrated using [curl](https://curl.haxx.se/) on the commandline.
 In this case, the example is `curl -d "text=great" http://text-processing.com/api/sentiment/` which can be recreated in Jython to test the service.
 Building on the GET expression above, the POST data is added as the second parameter of *urlopen*, thus the request will be in the form `urllib2.urlopen(url,data)`.
@@ -66,8 +67,7 @@ return post.read()
 ```
 
 The preview should show a JSON response with sentiment probability values.
-To retrieve sentiment analysis data for the first lines of the sonnets (remember we are still adding a column based on *first*!), put this basic Jython pattern together with the values of the cells.
-Paste this script into the expression window:
+To retrieve sentiment analysis data for the first lines of the sonnets (remember we are still adding a column based on *first*!), put the basic Jython pattern together with the values of the cells:
 
 ```
 import urllib2
@@ -83,7 +83,7 @@ Click *Ok* and the Jython script will run for every row in the column.
 The JSON response can then be parsed using the methods demonstrated in *Example 2*.
 Given the small expression window and uniform data, the script above is pragmatically simplified and compressed.
 If Refine is encountering problems, it is better to implement a more complete script with error handling.
-For example, the POST request script could be rewritten:
+For example, the POST request could be rewritten:
 
 ```
 import urllib2, urllib
@@ -102,9 +102,7 @@ else:
     return response
 ```
 
-this API allows 1000 per day per IP address.
-
-> Some APIs require headers with authentication tokens to be passed with the POST request. 
+> Some APIs require authentication tokens to be passed with the POST request as data or headers. 
 > Headers can be added as the third parameter of `urllib2.Request()` similar to how data was added in the example above.
 > Check the Python [urllib2 documentation](https://docs.python.org/2/library/urllib2.html) and [how-to](https://docs.python.org/2/howto/urllib2.html) for advanced options.
 > When harvesting web content, character encoding issues commonly produce errors in Python. 
@@ -115,7 +113,8 @@ this API allows 1000 per day per IP address.
 To practice constructing a POST request, read the documentation for [Sentiment Tool](http://sentiment.vivekn.com/docs/api/), another free API.
 Find the service URL and data key necessary to modify the Jython pattern above.
 Create a new column from *first* named `sentiment2` and test the script.
-There are many ways to write it, for example:
+
+There are many possible ways to create the request, for example:
 
 ```
 import urllib2
@@ -129,11 +128,14 @@ The JSON response contains different metrics, but it will be obvious that the AP
 These are simple free APIs for demonstration purposes, but it is important to critically investigate services to more fully understand the potential of the metrics.
 Both APIs use a [naive bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) to categorize text input.
 These models must be trained on pre-labeled data and will be most accurate on similar text.
-Text Processing is trained on twitter and movie review corpus[^1], while Sentiment Tool is trained on IMDb movie reviews.[^2]
-Thus both are optimized for small bits of modern English language similar to a review.
-The models are unlikely to produce quality results for sonnets filled with archaic words and phrases.
-In humanities we should be asking questions about the algorithms and thinking critically about the metrics they are capable of producing. 
-This is not a new technical skill, but an application of the historian's traditional expertise, not unlike unraveling the bias and limitations of physical primary source materials.
+Text Processing is trained on twitter and movie reviews[^1], and Sentiment Tool on IMDb movie reviews[^2].
+Thus both are optimized for small bits of modern English language similar to a review, with a limited bag of words used to determine the sentiment probabilities.
+Neither is likely to produce quality results for the sonnets filled with archaic words and phrases.
 
 [^1]: Jacob Perkins, "Sentiment Analysis with Python NLTK Text Classification", http://text-processing.com/demo/sentiment/
 [^2]: Vivek Narayanan, Ishan Arora, Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, [arXiv:1305.6143](https://arxiv.org/abs/1305.6143).
+
+We should be asking questions about the algorithms and thinking critically about the metrics they are capable of producing. 
+This is not a new technical skill, but an application of the historian's traditional expertise, not unlike interrogating physical primary materials to unravel the bias and read between the lines.
+Humanities scholars have expertise in synthesizing and evaluating convoluted sources to reveal important narratives, and must carry that skill into digital realm. 
+OpenRefine's flexible ability to wrangle data from raw aggregation to analysis supports exploratory research and formation of new arguments that would be difficult with any other tool. 

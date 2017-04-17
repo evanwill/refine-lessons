@@ -36,7 +36,8 @@ Because of this flexibility it has been embraced by [journalists](https://www.pr
 
 ### Examples
 
-This lesson presents three examples demonstrating workflows to harvest and process data from the web.
-First, "Fetching and Parsing HTML" introduces functions to parse an HTML document into a structured data set.
-Second, "URL Queries and Parsing JSON" introduces interacting with a simple web API to construct a full text data set of historic newspaper front pages. 
-Finally, "Advanced APIs" demonstrates using Jython to implement a POST request to a natural language processing web service API.
+This lesson presents three examples demonstrating workflows to harvest and process data from the web:
+
+1. *Fetching and Parsing HTML* transforms an ebook into a structured data set by parsing the HTML and using string array functions.
+2. *URL Queries and Parsing JSON* interacts with a simple web API to construct a full text data set of historic newspaper front pages. 
+3. *Advanced APIs* demonstrates using Jython to implement a POST request to a natural language processing web service.

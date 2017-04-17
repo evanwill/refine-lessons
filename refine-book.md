@@ -44,19 +44,21 @@ In this case, there is one URL in *Column 1* resulting in one cell in the *fetch
 Much of the web page is not sonnet text and must be removed to create a clean data set.
 First, it is necessary to identify a pattern that can isolate the desired content.
 Items will often be nested in a unique container or given a meaningful class or id.
-Click on the URL in *Column 1* to open the source in a new tab.
+
+To make examining the HTML easier, click on the URL in *Column 1* to open the source in a new tab.
 In this case the sonnets page does not have distinctive semantic markup, but each poem is contained inside a single `<p>` element. 
 Thus, if all the paragraphs are selected, the sonnets can be extracted from the array.
 
 On the *fetch* column, click on the menu arrow > *edit column* > *Add column based on this column*.
 Give the new column the name `parse`, then click in the *Expression* text box.
+
 Values in Refine can be transformed using the General Refine Expression Language ([GREL](https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language)).
 This box accepts GREL expressions that will be applied to each cell in the existing column to create values for the new one.
 The default expression is `value`, the GREL variable representing the current value of a cell. 
 This means that each cell will be copied to the new column. 
 The preview below the expression box will reflect this.
 
-GREL's `parseHtml()` function can read HTML content, allowing elements to be accessed using the jsoup [selector syntax](https://jsoup.org/cookbook/extracting-data/selector-syntax).
+GREL's `parseHtml()` function can read HTML content, allowing elements to be accessed using the [jsoup selector syntax](https://jsoup.org/cookbook/extracting-data/selector-syntax).
 Delete `value`, then type `value.parseHtml().select("p")` into the expression box.
 
 ![create new parse column](images/refine-parse-html.png)
@@ -81,7 +83,7 @@ Add the `slice()` function to the expression to preview the sub-set: `value.pars
 > Test out a transformation to see what happens--it is very easy to undo! 
 > The full history of operations is recorded in the `Undo / Redo` tab. 
 
-Clicking `ok` with this expression will result in a blank column, a common cause of confusion when working with arrays.
+Clicking *Ok* with this expression will result in a blank column, a common cause of confusion when working with arrays.
 Refine will not store an array object as a cell value. 
 It is necessary to use `toString()` or `join()` to convert the array into a string variable.
 The `join()` function concatenates an array with the specified separator. 
@@ -92,13 +94,13 @@ Thus, the final expression to create the *parse* column is:
 value.parseHtml().select("p").slice(37,-2).join("|")
 ```
 
-Click Ok to create the column.
+Click *Ok* to create the column.
 
 ### Split Cells
 
 The *parse* column now contains all the sonnets separated by "|", but the project still contains only one row. 
 Individual rows for each sonnet can be created by splitting the cell.
-Click the menu arrow on the *parse* column > *edit cells* > *split multivalued cells*. 
+Click the menu arrow on the *parse* column > *Edit cells* > *Split multivalued cells*. 
 Enter the separator `|` that was used to `join` in the last step.
 
 ![split multivalued cells](images/refine-split-multivalued.png)
@@ -114,9 +116,9 @@ An unexpected number would indicate a problem with the transformation.
 
 Each cell in the *parse* column now contains one sonnet surround by a `<p>` tag.
 The tags can be cleaned up by parsing the HTML again.
-Click on the *parse* column and select *edit cells* > *transform*.
-This will bring up a dialog box similar to create new column.
-Transform will overwrite the cells of the current column rather than creating a one.
+Click on the *parse* column and select *Edit cells* > *Transform*.
+This will bring up a dialog box similar to creating a new column.
+Transform will overwrite the cells of the current column rather than creating a new one.
 
 In the expression box, type `value.parseHtml()`.
 The preview will show a complete HTML tree starting with the `<html>` element.
@@ -127,7 +129,7 @@ Select the `p` tag, add an index number, and use the function `innerHtml()` to e
 value.parseHtml().select("p")[0].innerHtml()
 ```
 
-Click Ok to transform all 154 cells in the column. 
+Click *Ok* to transform all 154 cells in the column. 
 
 ![transform cells innerHtml](images/refine-innerhtml.png)
 
@@ -149,7 +151,7 @@ The entities will be replaced with normal whitespace.
 Any string value can be turned into an array using the `split()` function by providing the character or expression that separates the items (basically the opposite of `join()`). 
 
 In the sonnets each line ends with `<br />`, providing a convenient separator for splitting.
-The expression `split("<br />")` will create an array of the lines of each sonnet. 
+The expression `value.split("<br />")` will create an array of the lines of each sonnet. 
 Index numbers and slices can then be used to populate new columns.
 Keep in mind that Refine will not output an array directly to a cell.
 It will have to be converted back into a string value with `join()`.
@@ -158,7 +160,7 @@ Furthermore, the sonnet text contains a huge amount of unnecessary white space t
 This can be cut from each line using the `trim()` function.
 Trim automatically removes all leading and trailing white space, an essential for data cleaning. 
 
-Create new columns from the *parse* column using *Edit column* > *Add column based on this column* with these names and expressions:
+Create new columns from the *parse* column using these names and expressions:
 
 - number, `value.split("<br />")[0].trim()`
 - first, `value.split("<br />")[1].trim()`
@@ -170,15 +172,14 @@ To trim each line individually use the GREL `forEach` control, a powerful loop t
 
 The `forEach()` expression asks for an array, a variable name, and a function applied to the variable.
 Create new column named *text* from the *parse* column, and type `forEach(value.split("<br />"),lines,lines.trim())` in the expression box.
-Look closely at the components:
+Look closely at the parameters of this `forEach()`:
 
 - Array: `value.split("<br />")` creates an array from the string value in each cell.
 - Variable: each item in the array is then represented as the variable `lines` (it could be anything, `v` is often used).
-- Function: each item is then evaluated separately with the specified expression, `lines.trim()`.
+- Function: each item is then evaluated separately with the specified expression. In this case, `lines.trim()` cleans the white space from each sonnet line in the array.
 
-The results of each separate function is returned as a new array.
-Thus, the expression above will trim the individual line in each cell of the *parse* column.
-Because the result is a new array, additional functions can be applied to the end of `forEach()`, such as slice and join.
+The result of each separate function is returned as a new array.
+Thus, additional array functions can be applied to the end of `forEach()`, such as slice and join.
 The final expression to extract and clean the full sonnet text is:
 
 ```
@@ -208,12 +209,14 @@ Click on the *All* column > *Edit columns* > *Re-order / remove columns*.
 
 ![all column](images/refine-reorder.png)
 
-Drag unwanted column names to the right side, in this case *Column 1*, *fetch*, and *parse*. 
+Drag unwanted column names to the right side of the dialog box, in this case *Column 1*, *fetch*, and *parse*. 
 Drag the remaining columns into the desired order on the left side.
-Click *ok* to remove and reorder the data set. 
+Click *Ok* to remove and reorder the data set. 
 
 ![reorder columns](images/refine-reorder2.png)
 
-Use the export button to generate a version of the new sonnet table for use outside of Refine.
+Use filters and facets to explore and subset the collection of sonnets.
+Then click the export button to generate a version of the new sonnet table for use outside of Refine.
+Only the currently selected subset will be exported.
 
 ![export csv](images/refine-export.png)

@@ -1,7 +1,7 @@
 ## Example 2: URL Queries and Parsing JSON
 
 Many cultural institutions provide web APIs enabling users to access information about their collections via simple HTTP requests.
-These sources enable new queries and aggregations of text that were previously impossible, cutting across boundaries of repositories and collections to enable large scale analysis of both content and metadata.
+These sources enable new queries and aggregations of text that were previously impossible, cutting across boundaries of repositories and collections to support large scale analysis of both content and metadata.
 This example will harvest data from the [Chronicling America](http://chroniclingamerica.loc.gov/) project to collect a small set of newspaper front pages with full text.
 Following a common web scraping workflow, Refine is used to construct the query URL, fetch the information, and parse the JSON response.
 
@@ -11,7 +11,7 @@ Following a common web scraping workflow, Refine is used to construct the query 
 
 ### Start Chronicling America Project
 
-To get started after completing Example 1, click the *Open* button in the upper right.
+To get started after completing *Example 1*, click the *Open* button in the upper right.
 A new tab will open with the Refine start project view. 
 The tab with the *Example 1* project can be left open without impacting performance.
 Select *Create project*, and Get Data From *Clipboard*. 
@@ -38,23 +38,22 @@ The basic components are:
 
 - The base URL, `http://chroniclingamerica.loc.gov/`
 - The search service location for individual newspaper pages, `search/pages/results`
-- A web form *query string*, starting with `?` and made up of value pairs (`fieldname=value`) separated by `&`. Much like using the [advanced search form](http://chroniclingamerica.loc.gov/#tab=tab_advanced_search), the value pairs of the query string set the [options](http://chroniclingamerica.loc.gov/search/pages/opensearch.xml). 
+- A web form *query string*, starting with `?` and made up of value pairs (`fieldname=value`) separated by `&`. Much like using the [advanced search form](http://chroniclingamerica.loc.gov/#tab=tab_advanced_search), the value pairs of the query string set the [search options](http://chroniclingamerica.loc.gov/search/pages/opensearch.xml). 
 
 Using a GREL expression, the values in the CSV can be combined with these components to construct a search query URL.
-On the *state* column > *Edit column* > *Add column based on this column*.
-Name the new column `url` and paste in this expression:
+From the *state* column, add a column named `url` with this expression:
 
 ```
 "http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value.escape('url') + "&date1=" + cells['year'].value.escape('url') + "&date2=" + cells['year'].value + "&dateFilterType=yearRange&sequence=1&sort=date&rows=5&format=json"
 ``` 
 
-Notice that strings are concatenated using the plus sign.
+Notice that in GREL strings are concatenated using the plus sign.
 For example the expression `"one" + "two"` would result in "onetwo".
 The values from the cells of the table are accessed using GREL variables.
 The current value of each cell in *state* column is represented by `value`.
 Values from the same row in other columns can be retrieved using `cells['column name'].value`. 
 Thus `cells['year'].value` in row 1 will return "1865" from the *year* column.
-The `escape()` function is added to ensure the string is useable in a URL (basically the opposite of the `unescape()` function introduced in Example 1). 
+The `escape()` function is added to ensure the string is useable in a URL (basically the opposite of the `unescape()` function introduced in *Example 1*). 
  
 Explicitly, the first query URL will ask for newspapers from Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), sorting by date (`sort=date`), returning a maximum of five (`rows=5`) in JSON (`format=json`). 
 
@@ -77,8 +76,7 @@ The JSON key `items` contains an array of the individual newspapers returned by 
 To construct a orderly data set, it is necessary to parse the JSON and split each newspaper into its own row.
 
 GREL's `parseJson()` function allows us to select a key name to retrieve the corresponding values.
-Click on the *fetch* column > *Edit column* > *Add column based on this column*. 
-Name the column `items` and enter the expression:
+Add a new column based on *fetch* with the name `items` and enter this expression: 
 
 ```
 value.parseJson()['items'].join("|||")
@@ -93,7 +91,7 @@ Since the newspaper items contain an OCR text field, the strange separator "|||"
 ### Split Multivalued Cells
 
 With the individual newspapers isolated, separate rows can be created by splitting the cells.
-Click on the *items* column > *Edit cells* > *Split multivalued cells*, and enter the join used in the last step, `|||`. 
+Select *Split multivalued cells* on the *items* column, and enter the join used in the last step, `|||`. 
 
 After the operation, the top of the project table should read 20 rows.
 Clicking on Show as *records* should read 4, representing the original CSV rows.
@@ -105,7 +103,7 @@ Click on the *state* column > *Edit cells* > *Fill down*.
 
 This is a good point to clean up the unnecessary columns.
 Click on the *All* column > *Edit columns* > *Re-order / remove columns*.
-Drag all columns except *state* and *items* to the right side, then click *ok* to remove them. 
+Drag all columns except *state* and *items* to the right side, then click *Ok* to remove them. 
 With the original columns removed, both *records* and *rows* will read 20.
 
 ### Parse JSON values
@@ -124,12 +122,12 @@ Create a new column from *items* for each newspaper metadata element by parsing 
 After the desired information is extracted, the *items* column can be removed using *Edit column* > *Remove this column*. 
 
 Each column could be further refined using other GREL transformations.
-For example, to convert the date to a more readable format, use [date functions](https://github.com/OpenRefine/OpenRefine/wiki/GREL-Date-Functions).
+For example, to convert *date* to a more readable format, use [GREL date functions](https://github.com/OpenRefine/OpenRefine/wiki/GREL-Date-Functions).
 Click on the *date* column > *Edit cells* > *Transform* and use the expression `value.toDate("yyyymmdd").toString("yyyy-MM-dd")`.
 
 Another common workflow is to extend the data with further URL queries.
 For example, a link to the full issue information can be created based on the *lccn*.
-On *lccn* column > *Edit column* > *Add column based on this column* and use the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"`.
+Create a new column based on *lccn* using the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"`.
 Fetching this URL returns a complete list of the issue's pages, which could then be harvested. 
 
 The headlines of 1865 from the Northwest are ready to enjoy!

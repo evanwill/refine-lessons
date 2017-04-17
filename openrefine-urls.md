@@ -1,9 +1,9 @@
 ---
 title: |
-    Web Scraping with Open Refine
+    Web Scraping with OpenRefine
 authors:
 - Evan Williamson
-date: 2017-03-30
+date: 2017-04-17
 reviewers:
 layout: default
 ---
@@ -37,7 +37,7 @@ When working with text documents, Refine is particularly suited for this task, a
 Refine is a unique tool that combines the power of databases and scripting languages into an interactive and user friendly visual interface. 
 Because of this flexibility it has been embraced by [journalists](https://www.propublica.org/nerds/item/using-google-refine-for-data-cleaning), [librarians](http://data-lessons.github.io/library-openrefine/), [scientists](http://www.datacarpentry.org/OpenRefine-ecology-lesson/), and others needing to wrangle data from diverse sources and formats into structured information.
 
-![OpenRefine](images/openrefine.png)
+{% include figure.html filename="openrefine-urls/openrefine.png" caption="OpenRefine" %}
 
 > OpenRefine is a [free](https://www.gnu.org/philosophy/free-sw.en.html) and [open source](https://github.com/OpenRefine/OpenRefine) Java application.
 > The user interface is rendered by your web browser, but Refine is not a web application. No information is sent online and no internet connection is necessary.
@@ -46,10 +46,11 @@ Because of this flexibility it has been embraced by [journalists](https://www.pr
 
 ### Examples
 
-This lesson presents three examples demonstrating workflows to harvest and process data from the web.
-First, "Fetching and Parsing HTML" introduces functions to parse an HTML document into a structured data set.
-Second, "URL Queries and Parsing JSON" introduces interacting with a simple web API to construct a full text data set of historic newspaper front pages. 
-Finally, "Advanced APIs" demonstrates using Jython to implement a POST request to a natural language processing web service API.
+This lesson presents three examples demonstrating workflows to harvest and process data from the web:
+
+1. *Fetching and Parsing HTML* transforms an ebook into a structured data set by parsing the HTML and using string array functions.
+2. *URL Queries and Parsing JSON* interacts with a simple web API to construct a full text data set of historic newspaper front pages. 
+3. *Advanced APIs* demonstrates using Jython to implement a POST request to a natural language processing web service.
 
 ## Example 1: Fetching and Parsing HTML
 
@@ -71,7 +72,7 @@ Paste this URL into the text box:
 https://raw.githubusercontent.com/uidaholib/refine-demo/master/pg1105.html`
 ```
 
-![Refine clipboard](images/refine-clipboard1.png)
+{% include figure.html filename="openrefine-urls/refine-clipboard1.png" caption="Start project with clipboard" %}
 
 After clicking next, Refine should automatically identify the content as a line-based text file and the default parsing options should be correct.
 Add a descriptive *Project name* at the top right and click *Create project*.
@@ -97,19 +98,21 @@ In this case, there is one URL in *Column 1* resulting in one cell in the *fetch
 Much of the web page is not sonnet text and must be removed to create a clean data set.
 First, it is necessary to identify a pattern that can isolate the desired content.
 Items will often be nested in a unique container or given a meaningful class or id.
-Click on the URL in *Column 1* to open the source in a new tab.
+
+To make examining the HTML easier, click on the URL in *Column 1* to open the source in a new tab.
 In this case the sonnets page does not have distinctive semantic markup, but each poem is contained inside a single `<p>` element. 
 Thus, if all the paragraphs are selected, the sonnets can be extracted from the array.
 
 On the *fetch* column, click on the menu arrow > *edit column* > *Add column based on this column*.
 Give the new column the name `parse`, then click in the *Expression* text box.
+
 Values in Refine can be transformed using the General Refine Expression Language ([GREL](https://github.com/OpenRefine/OpenRefine/wiki/General-Refine-Expression-Language)).
 This box accepts GREL expressions that will be applied to each cell in the existing column to create values for the new one.
 The default expression is `value`, the GREL variable representing the current value of a cell. 
 This means that each cell will be copied to the new column. 
 The preview below the expression box will reflect this.
 
-GREL's `parseHtml()` function can read HTML content, allowing elements to be accessed using the jsoup [selector syntax](https://jsoup.org/cookbook/extracting-data/selector-syntax).
+GREL's `parseHtml()` function can read HTML content, allowing elements to be accessed using the [jsoup selector syntax](https://jsoup.org/cookbook/extracting-data/selector-syntax).
 Delete `value`, then type `value.parseHtml().select("p")` into the expression box.
 
 ![create new parse column](images/refine-parse-html.png)
@@ -134,7 +137,7 @@ Add the `slice()` function to the expression to preview the sub-set: `value.pars
 > Test out a transformation to see what happens--it is very easy to undo! 
 > The full history of operations is recorded in the `Undo / Redo` tab. 
 
-Clicking `ok` with this expression will result in a blank column, a common cause of confusion when working with arrays.
+Clicking *Ok* with this expression will result in a blank column, a common cause of confusion when working with arrays.
 Refine will not store an array object as a cell value. 
 It is necessary to use `toString()` or `join()` to convert the array into a string variable.
 The `join()` function concatenates an array with the specified separator. 
@@ -145,13 +148,13 @@ Thus, the final expression to create the *parse* column is:
 value.parseHtml().select("p").slice(37,-2).join("|")
 ```
 
-Click Ok to create the column.
+Click *Ok* to create the column.
 
 ### Split Cells
 
 The *parse* column now contains all the sonnets separated by "|", but the project still contains only one row. 
 Individual rows for each sonnet can be created by splitting the cell.
-Click the menu arrow on the *parse* column > *edit cells* > *split multivalued cells*. 
+Click the menu arrow on the *parse* column > *Edit cells* > *Split multivalued cells*. 
 Enter the separator `|` that was used to `join` in the last step.
 
 ![split multivalued cells](images/refine-split-multivalued.png)
@@ -167,9 +170,9 @@ An unexpected number would indicate a problem with the transformation.
 
 Each cell in the *parse* column now contains one sonnet surround by a `<p>` tag.
 The tags can be cleaned up by parsing the HTML again.
-Click on the *parse* column and select *edit cells* > *transform*.
-This will bring up a dialog box similar to create new column.
-Transform will overwrite the cells of the current column rather than creating a one.
+Click on the *parse* column and select *Edit cells* > *Transform*.
+This will bring up a dialog box similar to creating a new column.
+Transform will overwrite the cells of the current column rather than creating a new one.
 
 In the expression box, type `value.parseHtml()`.
 The preview will show a complete HTML tree starting with the `<html>` element.
@@ -180,7 +183,7 @@ Select the `p` tag, add an index number, and use the function `innerHtml()` to e
 value.parseHtml().select("p")[0].innerHtml()
 ```
 
-Click Ok to transform all 154 cells in the column. 
+Click *Ok* to transform all 154 cells in the column. 
 
 ![transform cells innerHtml](images/refine-innerhtml.png)
 
@@ -202,7 +205,7 @@ The entities will be replaced with normal whitespace.
 Any string value can be turned into an array using the `split()` function by providing the character or expression that separates the items (basically the opposite of `join()`). 
 
 In the sonnets each line ends with `<br />`, providing a convenient separator for splitting.
-The expression `split("<br />")` will create an array of the lines of each sonnet. 
+The expression `value.split("<br />")` will create an array of the lines of each sonnet. 
 Index numbers and slices can then be used to populate new columns.
 Keep in mind that Refine will not output an array directly to a cell.
 It will have to be converted back into a string value with `join()`.
@@ -211,7 +214,7 @@ Furthermore, the sonnet text contains a huge amount of unnecessary white space t
 This can be cut from each line using the `trim()` function.
 Trim automatically removes all leading and trailing white space, an essential for data cleaning. 
 
-Create new columns from the *parse* column using *Edit column* > *Add column based on this column* with these names and expressions:
+Create new columns from the *parse* column using these names and expressions:
 
 - number, `value.split("<br />")[0].trim()`
 - first, `value.split("<br />")[1].trim()`
@@ -223,15 +226,14 @@ To trim each line individually use the GREL `forEach` control, a powerful loop t
 
 The `forEach()` expression asks for an array, a variable name, and a function applied to the variable.
 Create new column named *text* from the *parse* column, and type `forEach(value.split("<br />"),lines,lines.trim())` in the expression box.
-Look closely at the components:
+Look closely at the parameters of this `forEach()`:
 
 - Array: `value.split("<br />")` creates an array from the string value in each cell.
 - Variable: each item in the array is then represented as the variable `lines` (it could be anything, `v` is often used).
-- Function: each item is then evaluated separately with the specified expression, `lines.trim()`.
+- Function: each item is then evaluated separately with the specified expression. In this case, `lines.trim()` cleans the white space from each sonnet line in the array.
 
-The results of each separate function is returned as a new array.
-Thus, the expression above will trim the individual line in each cell of the *parse* column.
-Because the result is a new array, additional functions can be applied to the end of `forEach()`, such as slice and join.
+The result of each separate function is returned as a new array.
+Thus, additional array functions can be applied to the end of `forEach()`, such as slice and join.
 The final expression to extract and clean the full sonnet text is:
 
 ```
@@ -261,20 +263,22 @@ Click on the *All* column > *Edit columns* > *Re-order / remove columns*.
 
 ![all column](images/refine-reorder.png)
 
-Drag unwanted column names to the right side, in this case *Column 1*, *fetch*, and *parse*. 
+Drag unwanted column names to the right side of the dialog box, in this case *Column 1*, *fetch*, and *parse*. 
 Drag the remaining columns into the desired order on the left side.
-Click *ok* to remove and reorder the data set. 
+Click *Ok* to remove and reorder the data set. 
 
 ![reorder columns](images/refine-reorder2.png)
 
-Use the export button to generate a version of the new sonnet table for use outside of Refine.
+Use filters and facets to explore and subset the collection of sonnets.
+Then click the export button to generate a version of the new sonnet table for use outside of Refine.
+Only the currently selected subset will be exported.
 
 ![export csv](images/refine-export.png)
 
 ## Example 2: URL Queries and Parsing JSON
 
 Many cultural institutions provide web APIs enabling users to access information about their collections via simple HTTP requests.
-These sources enable new queries and aggregations of text that were previously impossible, cutting across boundaries of repositories and collections to enable large scale analysis of both content and metadata.
+These sources enable new queries and aggregations of text that were previously impossible, cutting across boundaries of repositories and collections to support large scale analysis of both content and metadata.
 This example will harvest data from the [Chronicling America](http://chroniclingamerica.loc.gov/) project to collect a small set of newspaper front pages with full text.
 Following a common web scraping workflow, Refine is used to construct the query URL, fetch the information, and parse the JSON response.
 
@@ -284,7 +288,7 @@ Following a common web scraping workflow, Refine is used to construct the query 
 
 ### Start Chronicling America Project
 
-To get started after completing Example 1, click the *Open* button in the upper right.
+To get started after completing *Example 1*, click the *Open* button in the upper right.
 A new tab will open with the Refine start project view. 
 The tab with the *Example 1* project can be left open without impacting performance.
 Select *Create project*, and Get Data From *Clipboard*. 
@@ -311,23 +315,22 @@ The basic components are:
 
 - The base URL, `http://chroniclingamerica.loc.gov/`
 - The search service location for individual newspaper pages, `search/pages/results`
-- A web form *query string*, starting with `?` and made up of value pairs (`fieldname=value`) separated by `&`. Much like using the [advanced search form](http://chroniclingamerica.loc.gov/#tab=tab_advanced_search), the value pairs of the query string set the [options](http://chroniclingamerica.loc.gov/search/pages/opensearch.xml). 
+- A web form *query string*, starting with `?` and made up of value pairs (`fieldname=value`) separated by `&`. Much like using the [advanced search form](http://chroniclingamerica.loc.gov/#tab=tab_advanced_search), the value pairs of the query string set the [search options](http://chroniclingamerica.loc.gov/search/pages/opensearch.xml). 
 
 Using a GREL expression, the values in the CSV can be combined with these components to construct a search query URL.
-On the *state* column > *Edit column* > *Add column based on this column*.
-Name the new column `url` and paste in this expression:
+From the *state* column, add a column named `url` with this expression:
 
 ```
 "http://chroniclingamerica.loc.gov/search/pages/results/?state=" + value.escape('url') + "&date1=" + cells['year'].value.escape('url') + "&date2=" + cells['year'].value + "&dateFilterType=yearRange&sequence=1&sort=date&rows=5&format=json"
 ``` 
 
-Notice that strings are concatenated using the plus sign.
+Notice that in GREL strings are concatenated using the plus sign.
 For example the expression `"one" + "two"` would result in "onetwo".
 The values from the cells of the table are accessed using GREL variables.
 The current value of each cell in *state* column is represented by `value`.
 Values from the same row in other columns can be retrieved using `cells['column name'].value`. 
 Thus `cells['year'].value` in row 1 will return "1865" from the *year* column.
-The `escape()` function is added to ensure the string is useable in a URL (basically the opposite of the `unescape()` function introduced in Example 1). 
+The `escape()` function is added to ensure the string is useable in a URL (basically the opposite of the `unescape()` function introduced in *Example 1*). 
  
 Explicitly, the first query URL will ask for newspapers from Idaho (`state=Idaho`), from the year `1865`, only the front pages (`sequence=1`), sorting by date (`sort=date`), returning a maximum of five (`rows=5`) in JSON (`format=json`). 
 
@@ -350,8 +353,7 @@ The JSON key `items` contains an array of the individual newspapers returned by 
 To construct a orderly data set, it is necessary to parse the JSON and split each newspaper into its own row.
 
 GREL's `parseJson()` function allows us to select a key name to retrieve the corresponding values.
-Click on the *fetch* column > *Edit column* > *Add column based on this column*. 
-Name the column `items` and enter the expression:
+Add a new column based on *fetch* with the name `items` and enter this expression: 
 
 ```
 value.parseJson()['items'].join("|||")
@@ -366,7 +368,7 @@ Since the newspaper items contain an OCR text field, the strange separator "|||"
 ### Split Multivalued Cells
 
 With the individual newspapers isolated, separate rows can be created by splitting the cells.
-Click on the *items* column > *Edit cells* > *Split multivalued cells*, and enter the join used in the last step, `|||`. 
+Select *Split multivalued cells* on the *items* column, and enter the join used in the last step, `|||`. 
 
 After the operation, the top of the project table should read 20 rows.
 Clicking on Show as *records* should read 4, representing the original CSV rows.
@@ -378,7 +380,7 @@ Click on the *state* column > *Edit cells* > *Fill down*.
 
 This is a good point to clean up the unnecessary columns.
 Click on the *All* column > *Edit columns* > *Re-order / remove columns*.
-Drag all columns except *state* and *items* to the right side, then click *ok* to remove them. 
+Drag all columns except *state* and *items* to the right side, then click *Ok* to remove them. 
 With the original columns removed, both *records* and *rows* will read 20.
 
 ### Parse JSON values
@@ -397,12 +399,12 @@ Create a new column from *items* for each newspaper metadata element by parsing 
 After the desired information is extracted, the *items* column can be removed using *Edit column* > *Remove this column*. 
 
 Each column could be further refined using other GREL transformations.
-For example, to convert the date to a more readable format, use [date functions](https://github.com/OpenRefine/OpenRefine/wiki/GREL-Date-Functions).
+For example, to convert *date* to a more readable format, use [GREL date functions](https://github.com/OpenRefine/OpenRefine/wiki/GREL-Date-Functions).
 Click on the *date* column > *Edit cells* > *Transform* and use the expression `value.toDate("yyyymmdd").toString("yyyy-MM-dd")`.
 
 Another common workflow is to extend the data with further URL queries.
 For example, a link to the full issue information can be created based on the *lccn*.
-On *lccn* column > *Edit column* > *Add column based on this column* and use the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"`.
+Create a new column based on *lccn* using the expression `"http://chroniclingamerica.loc.gov/lccn/" + value + "/" + cells['date'].value + "/ed-1.json"`.
 Fetching this URL returns a complete list of the issue's pages, which could then be harvested. 
 
 The headlines of 1865 from the Northwest are ready to enjoy!
@@ -416,6 +418,7 @@ GREL does not have a built in function to use this type of API.
 However, the expression window language can be changed to [Jython](http://www.jython.org/), providing a more complete scripting environment where it is possible to implement a POST request.
 
 > [Jython](http://www.jython.org/) is Python implemented for the Java VM and comes bundled with Refine (look for the `.jar` file in `openrefine-2.7-rc.2/webapp/extensions/jython/`).
+> This means Python 2 scripts can be written or loaded into the expression window.
 > The [official documentation](https://github.com/OpenRefine/OpenRefine/wiki/Jython) is sparse.
 > The current version is Jython 2.7, based on [Python 2.7](https://docs.python.org/2.7/), and can be extended with non-standard libraries using a [work around](https://github.com/OpenRefine/OpenRefine/wiki/Extending-Jython-with-pypi-modules).
 > Keep in mind that spending time writing complex scripts moves away from the strengths of Refine. 
@@ -427,7 +430,7 @@ However, the expression window language can be changed to [Jython](http://www.jy
 Return to the Sonnets project completed in *Example 1*. 
 If the tab was closed, click *Open* > *Open Project* and find the Sonnets example (Refine saves everything for you!). 
 
-On the *first* column > *Edit column* > *Add column based on this column*, and name the new column `sentiment`.
+Add a new column based on the *first* column named `sentiment`.
 On the right side of the *Expression* box is a drop down to change the expression language.
 Select *Python / Jython* from the list.
 
@@ -462,7 +465,7 @@ If necessary, a throttle delay can be implemented by importing `time` and adding
 Urllib2 will automatically send a POST if data is added to the request object.
 For example, [Text Processing](http://text-processing.com/) provides natural language processing APIs based on [Python NLTK](http://www.nltk.org/).
 The documentation for the [Sentiment Analysis service](http://text-processing.com/docs/sentiment.html) provides a base URL and the name of the key (`text`) used for the data to be analyzed.
-No authentication is required and 1,000 calls per day are free.
+No authentication is required and 1,000 calls per day are free (as of April 2017).
 This type of API is often demonstrated using [curl](https://curl.haxx.se/) on the commandline.
 In this case, the example is `curl -d "text=great" http://text-processing.com/api/sentiment/` which can be recreated in Jython to test the service.
 Building on the GET expression above, the POST data is added as the second parameter of *urlopen*, thus the request will be in the form `urllib2.urlopen(url,data)`.
@@ -475,8 +478,7 @@ return post.read()
 ```
 
 The preview should show a JSON response with sentiment probability values.
-To retrieve sentiment analysis data for the first lines of the sonnets (remember we are still adding a column based on *first*!), put this basic Jython pattern together with the values of the cells.
-Paste this script into the expression window:
+To retrieve sentiment analysis data for the first lines of the sonnets (remember we are still adding a column based on *first*!), put the basic Jython pattern together with the values of the cells:
 
 ```
 import urllib2
@@ -492,7 +494,7 @@ Click *Ok* and the Jython script will run for every row in the column.
 The JSON response can then be parsed using the methods demonstrated in *Example 2*.
 Given the small expression window and uniform data, the script above is pragmatically simplified and compressed.
 If Refine is encountering problems, it is better to implement a more complete script with error handling.
-For example, the POST request script could be rewritten:
+For example, the POST request could be rewritten:
 
 ```
 import urllib2, urllib
@@ -511,9 +513,7 @@ else:
     return response
 ```
 
-this API allows 1000 per day per IP address.
-
-> Some APIs require headers with authentication tokens to be passed with the POST request. 
+> Some APIs require authentication tokens to be passed with the POST request as data or headers. 
 > Headers can be added as the third parameter of `urllib2.Request()` similar to how data was added in the example above.
 > Check the Python [urllib2 documentation](https://docs.python.org/2/library/urllib2.html) and [how-to](https://docs.python.org/2/howto/urllib2.html) for advanced options.
 > When harvesting web content, character encoding issues commonly produce errors in Python. 
@@ -524,7 +524,8 @@ this API allows 1000 per day per IP address.
 To practice constructing a POST request, read the documentation for [Sentiment Tool](http://sentiment.vivekn.com/docs/api/), another free API.
 Find the service URL and data key necessary to modify the Jython pattern above.
 Create a new column from *first* named `sentiment2` and test the script.
-There are many ways to write it, for example:
+
+There are many possible ways to create the request, for example:
 
 ```
 import urllib2
@@ -538,11 +539,14 @@ The JSON response contains different metrics, but it will be obvious that the AP
 These are simple free APIs for demonstration purposes, but it is important to critically investigate services to more fully understand the potential of the metrics.
 Both APIs use a [naive bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) to categorize text input.
 These models must be trained on pre-labeled data and will be most accurate on similar text.
-Text Processing is trained on twitter and movie review corpus[^1], while Sentiment Tool is trained on IMDb movie reviews.[^2]
-Thus both are optimized for small bits of modern English language similar to a review.
-The models are unlikely to produce quality results for sonnets filled with archaic words and phrases.
-In humanities we should be asking questions about the algorithms and thinking critically about the metrics they are capable of producing. 
-This is not a new technical skill, but an application of the historian's traditional expertise, not unlike unraveling the bias and limitations of physical primary source materials.
+Text Processing is trained on twitter and movie reviews[^1], and Sentiment Tool on IMDb movie reviews[^2].
+Thus both are optimized for small bits of modern English language similar to a review, with a limited bag of words used to determine the sentiment probabilities.
+Neither is likely to produce quality results for the sonnets filled with archaic words and phrases.
 
 [^1]: Jacob Perkins, "Sentiment Analysis with Python NLTK Text Classification", http://text-processing.com/demo/sentiment/
 [^2]: Vivek Narayanan, Ishan Arora, Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, [arXiv:1305.6143](https://arxiv.org/abs/1305.6143).
+
+We should be asking questions about the algorithms and thinking critically about the metrics they are capable of producing. 
+This is not a new technical skill, but an application of the historian's traditional expertise, not unlike interrogating physical primary materials to unravel the bias and read between the lines.
+Humanities scholars have expertise in synthesizing and evaluating convoluted sources to reveal important narratives, and must carry that skill into digital realm. 
+OpenRefine's flexible ability to wrangle data from raw aggregation to analysis supports exploratory research and formation of new arguments that would be difficult with any other tool. 
