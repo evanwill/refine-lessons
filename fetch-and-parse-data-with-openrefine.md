@@ -23,7 +23,9 @@ When working with text documents, Refine is particularly suited for this task, a
 David Huynh, the creator of Freebase Gridworks (2009) which became GoogleRefine (2010) and then OpenRefine (2012+), says Refine is:
 - more powerful than a spreadsheet
 - more interactive and visual than scripting
-- more provisional / exploratory / experimental / playful than a database [^huynh]
+- more provisional / exploratory / experimental / playful than a database 
+
+> David Huynh, ["Google Refine"](http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf), Computer-Assisted Reporting Conference 2011.
 
 Refine is a unique tool that combines the power of databases and scripting languages into an interactive and user friendly visual interface. 
 Because of this flexibility it has been embraced by [journalists](https://www.propublica.org/nerds/item/using-google-refine-for-data-cleaning), [librarians](http://data-lessons.github.io/library-openrefine/), [scientists](http://www.datacarpentry.org/OpenRefine-ecology-lesson/), and others needing to wrangle data from diverse sources and formats into structured information.
@@ -542,8 +544,12 @@ These are simple free APIs for demonstration purposes, but it is important to cr
 
 Both APIs use a [naive bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) to categorize text input.
 These models must be trained on pre-labeled data and will be most accurate on similar content.
-Text Processing is trained on twitter and movie reviews[^1], and Sentiment Tool on IMDb movie reviews[^2].
+Text Processing is trained on twitter and movie reviews, and Sentiment Tool on IMDb movie reviews.
 Thus both are optimized for small chunks of modern English language similar to a review, with a limited bag of words used to determine the sentiment probabilities.
+
+> For more info, see:
+> - Jacob Perkins, ["Sentiment Analysis with Python NLTK Text Classification"](http://text-processing.com/demo/sentiment/).
+> - Vivek Narayanan, Ishan Arora, and Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, [arXiv:1305.6143](https://arxiv.org/abs/1305.6143).
 
 Archaic words and phrases contribute significantly to the sonnets' sentiment, yet are unlikely to be given any weight in these models since they are not present in the training data.
 While comparing the metrics is fascinating, neither is likely to produce quality results for this data set.
@@ -555,8 +561,3 @@ Humanities scholars routinely synthesize and evaluate convoluted sources to reve
 
 With it's unique ability to interactively wrangle data from raw aggregation to analysis, Refine supports exploratory research and a wonderfully fluid and playful approach to data. 
 OpenRefine is a flexible, pragmatic tool that simplifies routine tasks and, when combined with domain knowledge, extends research capabilities.
-
-[^huynh]: David Huynh, "Google Refine", Computer-Assisted Reporting Conference 2011, [http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf](http://web.archive.org/web/20150528125345/http://davidhuynh.net/spaces/nicar2011/tutorial.pdf).
-[^1]: Jacob Perkins, "Sentiment Analysis with Python NLTK Text Classification", [http://text-processing.com/demo/sentiment/](http://text-processing.com/demo/sentiment/).
-[^2]: Vivek Narayanan, Ishan Arora, and Arjun Bhatia, "Fast and accurate sentiment classification using an enhanced Naive Bayes model", 2013, [arXiv:1305.6143](https://arxiv.org/abs/1305.6143).
-
