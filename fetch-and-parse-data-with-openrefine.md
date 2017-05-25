@@ -65,7 +65,7 @@ Start OpenRefine, select *Create project*, and Get Data From *Clipboard*.
 Paste this URL into the text box: 
 
 ```
-http://programminghistorian.github.io/ph-submissions/assets/fetch-and-parse-data-with-openrefine/pg1105.html
+https://raw.githubusercontent.com/uidaholib/refine-demo/master/pg1105.html
 ```
 
 ![](images/lesson/refine-clipboard1.png)
